@@ -1,2 +1,13 @@
 /build/
 /GameXOSTR.iso
+/live-build/binary/
+/live-build/cache/
+/live-build/chroot/
+/live-build/live/
+/live-build/*.iso
+/live-build/*.img
+/live-build/*.manifest
+/live-build/filesystem.*
+/live-build/config/*
+!/live-build/config/package-lists/
+!/live-build/config/package-lists/**

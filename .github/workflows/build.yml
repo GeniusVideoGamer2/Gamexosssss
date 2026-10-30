@@ -11,9 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install tools
-        run: sudo apt update && sudo apt install -y gcc make xorriso grub-pc-bin grub-common mtools
+        run: sudo apt-get update && sudo apt-get install -y live-build debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin mtools
       - name: Build
-        run: chmod +x build.sh && ./build.sh
+        run: sudo bash build.sh
       - name: Upload ISO
         uses: actions/upload-artifact@v4
         with:

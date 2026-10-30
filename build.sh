@@ -2,21 +2,30 @@
 set -euo pipefail
 
 root_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-build_dir="$root_dir/build"
-iso_dir="$build_dir/isodir"
-kernel_path="$iso_dir/boot/kernel.elf"
+live_build_dir="$root_dir/live-build"
 
-mkdir -p "$iso_dir/boot/grub"
+if [[ "$(id -u)" -ne 0 ]]; then
+	echo "Run this script as root: sudo bash build.sh" >&2
+	exit 1
+fi
 
-gcc -m32 -ffreestanding -fno-pie -fno-stack-protector \
-	-c "$root_dir/kernel/main.c" -o "$build_dir/kernel.o"
-gcc -m32 -ffreestanding -fno-pie \
-	-c "$root_dir/kernel/entry.S" -o "$build_dir/entry.o"
-ld -m elf_i386 -T "$root_dir/kernel/linker.ld" \
-	-o "$kernel_path" "$build_dir/entry.o" "$build_dir/kernel.o"
+for tool in lb debootstrap mksquashfs xorriso; do
+	if ! command -v "$tool" >/dev/null 2>&1; then
+		echo "Required build tool not found: $tool" >&2
+		exit 1
+	fi
+done
 
-grub-file --is-x86-multiboot "$kernel_path"
-cp "$root_dir/boot/bootloader.cfg" "$iso_dir/boot/grub/grub.cfg"
-grub-mkrescue -o "$root_dir/GameXOSTR.iso" "$iso_dir"
+cd "$live_build_dir"
+lb clean --purge
+sh auto/config
+lb build
 
+iso_path="$(find "$live_build_dir" -maxdepth 1 -type f -name '*.iso' -print -quit)"
+if [[ -z "$iso_path" ]]; then
+	echo "live-build completed without producing an ISO image" >&2
+	exit 1
+fi
+
+install -m 0644 "$iso_path" "$root_dir/GameXOSTR.iso"
 echo "GameXOSTR ISO created: $root_dir/GameXOSTR.iso"
