@@ -3,7 +3,7 @@ name: Build GameXOSTR ISO
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ main, Eben ]
 
 jobs:
   build:
@@ -19,3 +19,4 @@ jobs:
         with:
           name: GameXOSTR-ISO
           path: GameXOSTR.iso
+          if-no-files-found: error
