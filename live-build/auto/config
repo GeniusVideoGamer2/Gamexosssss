@@ -6,7 +6,6 @@ lb config noauto \
 	--architectures amd64 \
 	--archive-areas "main contrib non-free non-free-firmware" \
 	--binary-images iso-hybrid \
-	--bootloaders "grub-efi grub-pc" \
 	--debian-installer false \
 	--iso-application GameXOSTR \
 	--iso-publisher GameXOSTR \

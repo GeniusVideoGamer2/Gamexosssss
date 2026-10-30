@@ -1,0 +1,61 @@
+window {
+    background: linear-gradient(145deg, #101b2a, #172b3b 52%, #183b43);
+    color: #f3f7fa;
+    font-family: "Noto Sans", sans-serif;
+}
+
+.panel {
+    background-color: rgba(19, 31, 45, 0.88);
+    border: 1px solid rgba(225, 241, 247, 0.22);
+    border-radius: 22px;
+    padding: 34px;
+}
+
+.brand {
+    color: #9ee8dd;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.eyebrow {
+    color: #a9bac7;
+    font-size: 12px;
+}
+
+.title {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.description {
+    color: #d3dee6;
+    font-size: 15px;
+}
+
+button {
+    min-height: 42px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    color: #f7fbfc;
+    font-weight: bold;
+}
+
+button.primary {
+    background: linear-gradient(180deg, #48a99f, #277b7d);
+    border: 1px solid rgba(205, 255, 246, 0.45);
+}
+
+button.secondary {
+    background-color: rgba(220, 237, 244, 0.10);
+    border: 1px solid rgba(220, 237, 244, 0.25);
+}
+
+button:hover {
+    background-color: rgba(128, 224, 211, 0.30);
+}
+
+button:focus {
+    outline: 2px solid #9ee8dd;
+    outline-offset: 2px;
+}

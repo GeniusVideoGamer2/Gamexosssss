@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=GameXOSTR Welcome
+Comment=Set up GameXOSTR or open recovery tools
+Exec=/usr/bin/python3 /usr/share/gamexos/welcome.py
+Terminal=false
+X-GNOME-Autostart-enabled=true

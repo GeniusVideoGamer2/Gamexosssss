@@ -11,3 +11,5 @@
 /live-build/config/*
 !/live-build/config/package-lists/
 !/live-build/config/package-lists/**
+!/live-build/config/includes.chroot/
+!/live-build/config/includes.chroot/**
