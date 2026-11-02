@@ -9,6 +9,11 @@ if [[ "$(id -u)" -ne 0 ]]; then
 	exit 1
 fi
 
+if [[ ! -d "$live_build_dir" ]]; then
+	echo "Missing live-build directory: $live_build_dir" >&2
+	exit 1
+fi
+
 for tool in lb debootstrap mksquashfs xorriso; do
 	if ! command -v "$tool" >/dev/null 2>&1; then
 		echo "Required build tool not found: $tool" >&2
@@ -17,11 +22,22 @@ for tool in lb debootstrap mksquashfs xorriso; do
 done
 
 cd "$live_build_dir"
-lb clean --purge
-sh auto/config
+
+# Clean any stale build artifacts before regenerating the config.
+lb clean --purge || true
+
+# The repo stores the live-build config in live-build/auto/config.
+if [[ -x "./auto/config" ]]; then
+	./auto/config
+else
+	sh ./auto/config
+fi
+
 lb build
 
-iso_path="$(find "$live_build_dir" -maxdepth 1 -type f -name '*.iso' -print -quit)"
+# live-build may place the ISO under a nested images/ directory, not necessarily
+# directly in the live-build root. Search the tree for the generated ISO.
+iso_path="$(find "$live_build_dir" -type f -name '*.iso' -print -quit)"
 if [[ -z "$iso_path" ]]; then
 	echo "live-build completed without producing an ISO image" >&2
 	exit 1
