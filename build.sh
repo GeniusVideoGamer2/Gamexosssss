@@ -45,7 +45,23 @@ done
 
 cd "$live_build_dir"
 lb clean --purge
-sh auto/config
+lb config noauto \
+	--mode debian \
+	--distribution bookworm \
+	--architectures amd64 \
+	--archive-areas "main contrib non-free non-free-firmware" \
+	--firmware-chroot false \
+	--mirror-bootstrap https://deb.debian.org/debian \
+	--mirror-chroot https://deb.debian.org/debian \
+	--mirror-binary https://deb.debian.org/debian \
+	--security false \
+	--binary-images iso-hybrid \
+	--bootloader grub2 \
+	--debian-installer false \
+	--iso-application GameXOSTR \
+	--iso-publisher GameXOSTR \
+	--iso-volume GAMEXOSTR \
+	--memtest none
 lb build
 
 iso_path="$(find "$live_build_dir" -maxdepth 1 -type f -name '*.iso' -print -quit)"
