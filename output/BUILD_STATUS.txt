@@ -1,0 +1,20 @@
+GameXOSTR ISO build status
+==========================
+
+Current build status:
+- The previous GitHub Actions run reported success only because the workflow uploaded a 1 KB zero-filled placeholder. That workflow behavior has now been removed.
+- The real failure is from the Ubuntu 24.04 `live-build` firmware helper requesting the obsolete URL https://deb.debian.org/debian/dists/bookworm/Contents-amd64.gz, which returns HTTP 404.
+- The build config now disables that obsolete firmware auto-discovery and the package list explicitly requests common firmware packages.
+- The workflow now requires a real ISO larger than 100 MB with an El Torito boot catalog before upload.
+- The updated workflow still needs a successful GitHub Actions run before a real ISO can be claimed or downloaded.
+
+The only way to produce the ISO in a valid environment is to run this on a real Debian 12 / Ubuntu 24.04 host or a privileged VM/container:
+
+sudo apt-get update
+sudo apt-get install -y live-build debootstrap debian-archive-keyring squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin mtools
+sudo bash build.sh
+
+Expected output:
+- GameXOSTR.iso in the repository root
+
+This directory is reserved for the verified ISO artifact. No bootable ISO is present yet.

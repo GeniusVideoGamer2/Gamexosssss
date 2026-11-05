@@ -19,28 +19,23 @@ jobs:
             squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin mtools
 
       - name: Build ISO
-        id: build
-        continue-on-error: true
-        run: |
-          sudo bash build.sh
+        run: sudo bash build.sh
 
-      - name: Create fallback ISO artifact if build fails
-        if: always()
+      - name: Validate bootable ISO
         shell: bash
         run: |
-          mkdir -p artifact
-          if [ -f GameXOSTR.iso ]; then
-            cp GameXOSTR.iso artifact/GameXOSTR.iso
-          else
-            dd if=/dev/zero of=artifact/GameXOSTR.iso bs=1M count=1 status=none
-            printf '%s\n' "This is a placeholder ISO artifact created because the live-build pipeline failed." > artifact/BUILD_REASON.txt
+          test -s GameXOSTR.iso
+          size_bytes="$(stat -c '%s' GameXOSTR.iso)"
+          if (( size_bytes < 100000000 )); then
+            echo "ISO is unexpectedly small: ${size_bytes} bytes" >&2
+            exit 1
           fi
-          ls -l artifact
+          xorriso -indev GameXOSTR.iso -report_el_torito plain 2>&1 | tee /tmp/el-torito-report.txt
+          grep -qi 'El Torito' /tmp/el-torito-report.txt
 
       - name: Upload ISO artifact
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: GameXOSTR-ISO
-          path: artifact/**
+          path: GameXOSTR.iso
           if-no-files-found: error

@@ -13,3 +13,8 @@ python3-gi
 gir1.2-gtk-3.0
 pkexec
 udisks2
+firmware-linux
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-brcm80211
