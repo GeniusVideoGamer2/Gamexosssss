@@ -36,7 +36,7 @@ if ! chroot / /bin/true >/dev/null 2>&1; then
 	exit 1
 fi
 
-for tool in lb debootstrap mksquashfs xorriso grub-mkrescue mcopy; do
+for tool in lb debootstrap mksquashfs xorriso grub-mkrescue mcopy isohybrid; do
 	if ! command -v "$tool" >/dev/null 2>&1; then
 		echo "Required build tool not found: $tool" >&2
 		exit 1

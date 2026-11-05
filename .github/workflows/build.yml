@@ -16,7 +16,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             live-build debootstrap debian-archive-keyring \
-            squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin mtools
+            squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin \
+            mtools syslinux-utils
 
       - name: Build ISO
         run: sudo bash build.sh
@@ -30,7 +31,7 @@ jobs:
             echo "ISO is unexpectedly small: ${size_bytes} bytes" >&2
             exit 1
           fi
-          xorriso -indev GameXOSTR.iso -report_el_torito plain 2>&1 | tee /tmp/el-torito-report.txt
+          xorriso -indev GameXOSTR.iso -report_el_torito plain > /tmp/el-torito-report.txt
           grep -qi 'El Torito' /tmp/el-torito-report.txt
 
       - name: Upload ISO artifact
