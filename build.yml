@@ -1,0 +1,107 @@
+name: Build GameXOSTR ISO
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, Eben ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    defaults:
+      run:
+        # Explicit bash => "bash -e -o pipefail": a failing build.sh is never
+        # hidden behind "| tee".
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          # Preinstalled toolchains this job does not use. A desktop live
+          # image (chroot + squashfs + ISO) needs a lot of room.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            live-build debootstrap debian-archive-keyring ca-certificates wget \
+            squashfs-tools xorriso mtools dosfstools \
+            grub-common grub-pc-bin grub-efi-amd64-bin \
+            syslinux syslinux-common isolinux
+
+          for tool in lb debootstrap mksquashfs unsquashfs xorriso grub-mkrescue mcopy mkfs.vfat; do
+            if ! command -v "$tool" >/dev/null 2>&1; then
+              echo "::error title=Missing build tool::$tool was not found after installing dependencies"
+              exit 1
+            fi
+          done
+          if [ ! -e /usr/share/debootstrap/scripts/bookworm ]; then
+            echo "::error title=debootstrap::this debootstrap has no bookworm script"
+            exit 1
+          fi
+          lb --version
+          debootstrap --version
+          xorriso -version 2>&1 | sed -n '1p'
+
+      - name: Build ISO with live-build
+        run: |
+          rm -f GameXOSTR.iso build.log
+          # build.sh exits non-zero on any failure; pipefail carries that
+          # status through tee, so this step fails and the full log stays in
+          # the job output (and in build.log).
+          sudo bash build.sh 2>&1 | tee build.log
+          test -f GameXOSTR.iso
+
+      - name: Verify ISO structure with xorriso
+        run: |
+          bash scripts/verify-iso.sh GameXOSTR.iso 2>&1 | tee verify.log
+
+      - name: Record verified ISO
+        run: |
+          sha256sum GameXOSTR.iso | tee GameXOSTR.iso.sha256
+          {
+            echo "### GameXOSTR ISO built and verified"
+            echo
+            echo "xorriso confirmed an ISO 9660 image with El Torito BIOS and UEFI boot entries, a live kernel, initrd and SquashFS, and a Debian 12 root filesystem."
+            echo
+            echo "- Size: $(stat -c '%s' GameXOSTR.iso) bytes"
+            echo "- SHA-256: $(cut -d' ' -f1 GameXOSTR.iso.sha256)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # No "if:" => runs only when every previous step succeeded, i.e. only
+      # after a real GameXOSTR.iso was built and verified.
+      - name: Upload verified ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameXOSTR-ISO
+          path: |
+            GameXOSTR.iso
+            GameXOSTR.iso.sha256
+          if-no-files-found: error
+          compression-level: 0
+
+      - name: Show failure details
+        if: failure()
+        run: |
+          echo "::error title=No ISO produced::The build or ISO verification failed. Nothing was uploaded as an artifact."
+          if [ -f verify.log ]; then
+            echo "::group::verify.log"
+            cat verify.log
+            echo "::endgroup::"
+          fi
+          if [ -f build.log ]; then
+            echo "::group::Error-looking lines in build.log"
+            grep -nEi '^E:|\berror\b|\bfailed\b' build.log | tail -n 100 || echo "(no matching lines)"
+            echo "::endgroup::"
+            echo "::group::Last 200 lines of build.log"
+            tail -n 200 build.log
+            echo "::endgroup::"
+          fi
+          df -h
