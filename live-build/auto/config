@@ -12,6 +12,7 @@ lb config noauto \
 	--mirror-binary https://deb.debian.org/debian \
 	--security false \
 	--binary-images iso-hybrid \
+	--bootloader grub2 \
 	--debian-installer false \
 	--iso-application GameXOSTR \
 	--iso-publisher GameXOSTR \

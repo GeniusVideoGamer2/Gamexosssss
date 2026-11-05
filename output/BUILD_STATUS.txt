@@ -3,10 +3,11 @@ GameXOSTR ISO build status
 
 Current build status:
 - The previous GitHub Actions run reported success only because the workflow uploaded a 1 KB zero-filled placeholder. That workflow behavior has now been removed.
-- The real failure is from the Ubuntu 24.04 `live-build` firmware helper requesting the obsolete URL https://deb.debian.org/debian/dists/bookworm/Contents-amd64.gz, which returns HTTP 404.
-- The build config now disables that obsolete firmware auto-discovery and the package list explicitly requests common firmware packages.
+- The firmware index failure was fixed by disabling the old helper and explicitly requesting common firmware packages.
+- The next run reached ISO packaging, then failed because Ubuntu's old Syslinux template expects `/usr/lib/syslinux/isolinux.bin` and `/usr/lib/syslinux/vesamenu.c32`, while Debian Bookworm installs those files under different paths.
+- The live-build config now selects GRUB2 for the hybrid ISO to bypass the incompatible legacy Syslinux template.
 - The workflow now requires a real ISO larger than 100 MB with an El Torito boot catalog before upload.
-- The updated workflow still needs a successful GitHub Actions run before a real ISO can be claimed or downloaded.
+- The GRUB2 configuration change still needs a successful GitHub Actions run before a real ISO can be claimed or downloaded.
 
 The only way to produce the ISO in a valid environment is to run this on a real Debian 12 / Ubuntu 24.04 host or a privileged VM/container:
 
