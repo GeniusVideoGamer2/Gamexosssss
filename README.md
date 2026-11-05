@@ -20,6 +20,9 @@ sudo bash build.sh
 The build produces `GameXOSTR.iso` in the repository root. GitHub Actions builds
 the same image and publishes it as the `GameXOSTR-ISO` artifact.
 
+Run `make check` to validate the shell scripts, welcome app syntax, and C source
+syntax without installing the ISO build dependencies.
+
 This is an early system foundation, not a finished desktop release. The custom
 startup animation, recovery UI, Liquid Glass styling, and GameXOS application
 shell still need implementation. Windows application compatibility is provided
