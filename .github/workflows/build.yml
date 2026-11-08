@@ -3,7 +3,9 @@ name: Build GameXOSTR ISO
 on:
   workflow_dispatch:
   push:
-    branches: [ main, Eben ]
+
+permissions:
+  contents: read
 
 jobs:
   build:
