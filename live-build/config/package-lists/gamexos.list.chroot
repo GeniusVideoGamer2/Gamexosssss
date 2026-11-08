@@ -18,3 +18,4 @@ firmware-iwlwifi
 firmware-realtek
 firmware-atheros
 firmware-brcm80211
+syslinux-utils
